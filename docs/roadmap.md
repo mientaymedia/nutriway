@@ -17,7 +17,8 @@ Cập nhật ngay khi xong mỗi tính năng (đã chạy thử). Chi tiết thi
 
 - [ ] Kết nối Postgres, Drizzle, migration đầu tiên
 - [x] Lõi gọi AccessTrade (`src/lib/accesstrade/`): chuẩn hoá tiền, thời gian, id; bóc vỏ 8 kiểu response; bộ điều tiết 10 request/phút; client `cashback/campaigns` và `product_link/create` (59 test)
-- [ ] Các endpoint còn lại: `datafeeds`, `top_products`, voucher, `transactions`, `order-list`, `order-products`
+- [x] `datafeeds` và `top_products`: chuẩn hoá bản ghi, bản ghi hỏng ghi vào `skipped` kèm lý do (87 test)
+- [ ] Voucher (`offers_informations`), `transactions`, `order-list`, `order-products`
 - [ ] Đồng bộ định kỳ vào Postgres: `cashback/campaigns`, `datafeeds`, `top_products`, voucher
 - [ ] Chạy thử các câu hỏi cần kiểm chứng ở `integrations/accesstrade-api.md` mục 7
 - [ ] Quản trị duyệt sản phẩm
