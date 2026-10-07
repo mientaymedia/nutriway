@@ -9,9 +9,9 @@ Cập nhật ngay khi xong mỗi tính năng (đã chạy thử). Chi tiết thi
 - [x] `docs/business-flow.md`, `docs/spec.md`
 - [x] Tài liệu tích hợp AccessTrade và MoMo
 - [x] `.env.example` (chỉ giá trị giả)
-- [ ] Cấu hình tên và email người commit cho git
-- [ ] Commit đầu tiên
-- [ ] Tạo repo `mientaymedia/nutriway` (private) trên GitHub, nối remote, push
+- [x] Cấu hình tên và email người commit cho git (riêng repo này)
+- [x] Commit đầu tiên
+- [x] Repo `mientaymedia/nutriway` (private) trên GitHub, đã nối remote và push `main`
 
 ## Giai đoạn 1 — Danh mục và affiliate
 
@@ -55,12 +55,11 @@ Cập nhật ngay khi xong mỗi tính năng (đã chạy thử). Chi tiết thi
 
 ## Đang chờ từ chủ dự án
 
-1. Cấu hình tên và email người commit cho git (hoặc cho biết dùng danh tính nào).
-2. Tạo repo trống `mientaymedia/nutriway` (private) trên GitHub.
-3. Đổi API key AccessTrade và đặt vào `ACCESSTRADE_API_KEY` (trong terminal của bạn).
-4. Bộ khoá MoMo **TEST** để phát triển (bộ production chỉ dùng khi lên thật).
-5. Tài liệu API hoá đơn điện tử của P.A Việt Nam và tài khoản môi trường thử.
-6. Nguồn dữ liệu chính thức từ Droppii theo thoả thuận.
-7. Cổng thanh toán của ứng dụng "NUTRIWAY" (HMAC-SHA256, hoàn tiền 180 ngày) là cổng nào.
-8. Trỏ DNS `nutriway.vn` về Cloudflare.
-9. Thông báo website với Bộ Công Thương; giấy xác nhận nội dung quảng cáo thực phẩm chức năng.
+1. Đặt API key AccessTrade vào biến môi trường `ACCESSTRADE_API_KEY` (lệnh `setx` trong terminal của bạn, đã đổi key mới).
+2. Cài Docker (hoặc cho biết dùng Postgres ở đâu khi phát triển). Máy dev hiện chưa có Docker.
+3. Bộ khoá MoMo **TEST** để phát triển (bộ production chỉ dùng khi lên thật).
+4. Tài liệu API hoá đơn điện tử của P.A Việt Nam và tài khoản môi trường thử.
+5. Nguồn dữ liệu chính thức từ Droppii theo thoả thuận.
+6. Cổng thanh toán của ứng dụng "NUTRIWAY" (HMAC-SHA256, hoàn tiền 180 ngày) là cổng nào.
+7. Trỏ DNS `nutriway.vn` về Cloudflare.
+8. Thông báo website với Bộ Công Thương; giấy xác nhận nội dung quảng cáo thực phẩm chức năng.
