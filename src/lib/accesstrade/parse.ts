@@ -125,6 +125,15 @@ export function toAtIso(date: Date): string {
   return validDate(date, String(date)).toISOString().replace(/\.\d{3}Z$/, "Z");
 }
 
+/** Dạng `DD-MM-YYYY` mà datafeeds và top_products nhận. Mặc định tính theo ngày Việt Nam (UTC+7). */
+export function toDdMmYyyy(date: Date, offsetMinutes: number = BARE_TIMESTAMP_OFFSET_MINUTES): string {
+  validDate(date, String(date));
+  const local = new Date(date.getTime() + offsetMinutes * 60_000);
+  const dd = String(local.getUTCDate()).padStart(2, "0");
+  const mm = String(local.getUTCMonth() + 1).padStart(2, "0");
+  return `${dd}-${mm}-${local.getUTCFullYear()}`;
+}
+
 /** `is_hot` trả chuỗi "True"/"False", mà "False" là truthy trong JavaScript. */
 export function parseStringBool(value: unknown): boolean {
   if (typeof value === "boolean") return value;

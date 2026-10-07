@@ -6,6 +6,7 @@ import {
   parseStringBool,
   parseVndAmount,
   toAtIso,
+  toDdMmYyyy,
 } from "./parse";
 
 describe("parseVndAmount", () => {
@@ -125,5 +126,19 @@ describe("asId", () => {
     expect(() => asId(Number("5585194803623188142"), "campaign_id")).toThrow(/campaign_id/);
     expect(() => asId("")).toThrow(RangeError);
     expect(() => asId(null)).toThrow(RangeError);
+  });
+});
+
+describe("toDdMmYyyy", () => {
+  it("tính theo ngày Việt Nam mặc định", () => {
+    expect(toDdMmYyyy(new Date("2017-09-07T17:00:00Z"))).toBe("08-09-2017");
+  });
+
+  it("đổi được múi giờ", () => {
+    expect(toDdMmYyyy(new Date("2017-09-07T17:00:00Z"), 0)).toBe("07-09-2017");
+  });
+
+  it("từ chối ngày không hợp lệ", () => {
+    expect(() => toDdMmYyyy(new Date("không phải ngày"))).toThrow(RangeError);
   });
 });
