@@ -9,6 +9,7 @@ import {
   reqHttpUrl,
   reqMoney,
   reqString,
+  salePriceOf,
   type Raw,
   type Skipped,
 } from "./normalize";
@@ -49,7 +50,7 @@ export function normalizeTopProduct(raw: Raw): TopProduct {
     affLink: reqHttpUrl(raw, "aff_link"),
     imageUrl: optImageUrl(raw, "image"),
     price,
-    salePrice: optMoney(raw, "discount") ?? price,
+    salePrice: salePriceOf(price, optMoney(raw, "discount")),
     description: optString(raw, "desc"),
     shortDescription: optString(raw, "short_desc"),
   };

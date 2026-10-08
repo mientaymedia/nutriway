@@ -142,6 +142,131 @@ export async function getActiveVouchers(limit = 12): Promise<CatalogResult<Vouch
   }
 }
 
+export type SortKey = "moi-nhat" | "gia-thap" | "gia-cao" | "giam-nhieu";
+
+export const SORT_OPTIONS: { key: SortKey; label: string }[] = [
+  { key: "moi-nhat", label: "Mới nhất" },
+  { key: "gia-thap", label: "Giá thấp đến cao" },
+  { key: "gia-cao", label: "Giá cao đến thấp" },
+  { key: "giam-nhieu", label: "Giảm nhiều nhất" },
+];
+
+export function isSortKey(value: unknown): value is SortKey {
+  return SORT_OPTIONS.some((option) => option.key === value);
+}
+
+/** Số trang lấy từ mỗi chiến dịch khi dựng kho duyệt. */
+const POOL_PAGES = 3;
+const POOL_PAGE_SIZE = 200;
+
+/**
+ * Kho sản phẩm để khách duyệt và sắp xếp.
+ *
+ * `/v1/datafeeds` KHÔNG có tham số sắp xếp, nên phải tải sẵn một kho rồi sắp xếp
+ * trong bộ nhớ. Kho này là một phần của 16 triệu sản phẩm, không phải toàn bộ —
+ * giao diện nói rõ điều đó thay vì để khách tưởng đang sắp xếp cả kho.
+ */
+export async function getProductPool(): Promise<CatalogResult<DatafeedProduct>> {
+  "use cache";
+  cacheLife("hours");
+  if (!hasAccessTrade()) return notConfigured();
+  try {
+    const at = client();
+    const requests = FEATURED_CAMPAIGNS.flatMap((campaign) =>
+      Array.from({ length: POOL_PAGES }, (_, index) =>
+        listDatafeeds(at, { campaign, limit: POOL_PAGE_SIZE, page: index + 1 }),
+      ),
+    );
+    const pages = await Promise.all(requests);
+
+    const items: DatafeedProduct[] = [];
+    const seen = new Set<string>();
+    for (const page of pages) {
+      for (const product of page.products) {
+        if (!product.imageUrl || seen.has(product.productId)) continue;
+        seen.add(product.productId);
+        items.push(product);
+      }
+    }
+    return {
+      state: "ok",
+      items,
+      skippedCount: pages.reduce((sum, page) => sum + page.skipped.length, 0),
+      asOf: Date.now(),
+    };
+  } catch (error) {
+    return failed(error);
+  }
+}
+
+function sorted(items: readonly DatafeedProduct[], sort: SortKey): DatafeedProduct[] {
+  const copy = [...items];
+  switch (sort) {
+    case "gia-thap":
+      return copy.sort((a, b) => a.salePrice - b.salePrice);
+    case "gia-cao":
+      return copy.sort((a, b) => b.salePrice - a.salePrice);
+    case "giam-nhieu":
+      return copy.sort((a, b) => {
+        const rate = (p: DatafeedProduct) => (p.price > 0 ? (p.price - p.salePrice) / p.price : 0);
+        return rate(b) - rate(a);
+      });
+    default:
+      return copy.sort((a, b) => (b.updatedAt?.getTime() ?? 0) - (a.updatedAt?.getTime() ?? 0));
+  }
+}
+
+export interface ProductListPage {
+  items: DatafeedProduct[];
+  state: CatalogState;
+  /** Tổng số sản phẩm trong kho đang duyệt, không phải toàn bộ kho AccessTrade. */
+  poolSize: number;
+  page: number;
+  totalPages: number;
+}
+
+/** Một trang sản phẩm đã sắp xếp. `query` lọc theo tên, bỏ dấu. */
+export async function listProducts(options: {
+  sort?: SortKey;
+  page?: number;
+  perPage?: number;
+  query?: string;
+}): Promise<ProductListPage> {
+  const sort = options.sort ?? "moi-nhat";
+  const perPage = options.perPage ?? 48;
+  const pool = await getProductPool();
+
+  const words = foldText(options.query ?? "").split(/\s+/).filter(Boolean);
+  const matched =
+    words.length === 0
+      ? pool.items
+      : pool.items.filter((product) => {
+          const haystack = foldText(`${product.name} ${product.merchant ?? ""} ${product.category ?? ""}`);
+          return words.every((word) => haystack.includes(word));
+        });
+
+  const ordered = sorted(matched, sort);
+  const totalPages = Math.max(1, Math.ceil(ordered.length / perPage));
+  const page = Math.min(Math.max(1, options.page ?? 1), totalPages);
+  return {
+    items: ordered.slice((page - 1) * perPage, page * perPage),
+    state: pool.state,
+    poolSize: ordered.length,
+    page,
+    totalPages,
+  };
+}
+
+/** Bỏ dấu để tìm "sua rua mat" ra "sữa rửa mặt". */
+export function foldText(value: string): string {
+  return value
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .replace(/đ/g, "d")
+    .replace(/Đ/g, "D")
+    .toLowerCase();
+}
+
 /**
  * Sản phẩm liên quan: cùng nhà cung cấp, bỏ chính nó ra.
  * Dựa trên tập đã cache nên không tốn thêm lượt gọi AccessTrade.

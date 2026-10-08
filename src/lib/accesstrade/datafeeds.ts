@@ -9,6 +9,7 @@ import {
   reqHttpUrl,
   reqMoney,
   reqString,
+  salePriceOf,
   type Raw,
   type Skipped,
 } from "./normalize";
@@ -58,7 +59,7 @@ export function normalizeDatafeedProduct(raw: Raw): DatafeedProduct {
     affLink: reqHttpUrl(raw, "aff_link"),
     imageUrl: optImageUrl(raw, "image"),
     price,
-    salePrice: optMoney(raw, "discount") ?? price,
+    salePrice: salePriceOf(price, optMoney(raw, "discount")),
     discountAmount: optMoney(raw, "discount_amount") ?? 0,
     discountRate: optNumber(raw, "discount_rate") ?? 0,
     hasDiscount: raw.status_discount === 1 || raw.status_discount === "1",

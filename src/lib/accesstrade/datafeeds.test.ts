@@ -61,6 +61,18 @@ describe("normalizeDatafeedProduct", () => {
     expect(normalizeDatafeedProduct({ ...sample, discount: undefined }).salePrice).toBe(175000);
   });
 
+  it("discount = 0 nghĩa là không khuyến mãi, KHÔNG phải giá bằng 0", () => {
+    // 18/20 sản phẩm Shopee trả discount: 0 kèm price hợp lệ. Hiểu sai là cả
+    // trang hiện "0 đồng".
+    const product = normalizeDatafeedProduct({ ...sample, price: 200000, discount: 0 });
+    expect(product.salePrice).toBe(200000);
+    expect(product.price).toBe(200000);
+  });
+
+  it("bỏ qua giá khuyến mãi cao hơn giá gốc", () => {
+    expect(normalizeDatafeedProduct({ ...sample, price: 100000, discount: 150000 }).salePrice).toBe(100000);
+  });
+
   it("từ chối bản ghi thiếu trường bắt buộc", () => {
     expect(() => normalizeDatafeedProduct({ ...sample, name: undefined })).toThrow(/name/);
     expect(() => normalizeDatafeedProduct({ ...sample, product_id: null })).toThrow(/product_id/);

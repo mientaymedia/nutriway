@@ -90,6 +90,21 @@ export function optId(raw: Raw, key: string): string | null {
   return typeof value === "number" && Number.isSafeInteger(value) ? String(value) : optString(raw, key);
 }
 
+/**
+ * Giá bán thực tế từ `price` và `discount`.
+ *
+ * `discount` của AccessTrade là GIÁ SAU khuyến mãi, nhưng khi sản phẩm không có
+ * khuyến mãi thì trường này về 0 chứ không phải null. Kiểm chứng ngày 2026-10-08:
+ * 18 trong 20 sản phẩm Shopee có `discount: 0` kèm `price` hợp lệ — hiểu thẳng
+ * `discount` là giá bán sẽ hiện "0 đồng" cho gần như cả trang.
+ *
+ * Giá sau khuyến mãi chỉ được dùng khi lớn hơn 0 và không vượt giá gốc.
+ */
+export function salePriceOf(price: number, discount: number | null): number {
+  if (discount === null || discount <= 0 || discount > price) return price;
+  return discount;
+}
+
 export function optNumber(raw: Raw, key: string): number | null {
   const value = raw[key];
   return typeof value === "number" && Number.isFinite(value) ? value : null;
