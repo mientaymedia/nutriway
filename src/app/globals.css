@@ -2,14 +2,15 @@
 
 /* Nhận diện NutriWay: xanh rừng đậm của chữ "nutriway", xanh lá chanh của chữ "vietnam". */
 @theme {
-  --color-brand-50: #e9f2ef;
-  --color-brand-100: #c7ded7;
-  --color-brand-500: #12735a;
-  --color-brand-600: #0a5240;
-  --color-brand-700: #083f31;
-  --color-accent-400: #96d161;
-  --color-accent-500: #7ac143;
-  --color-accent-600: #63a333;
+  /* Lấy trực tiếp từ file logo chính thức: #045c42 (chữ nutriway), #77b234 (chữ vietnam). */
+  --color-brand-50: #e8f1ed;
+  --color-brand-100: #c4ddd4;
+  --color-brand-500: #0a7254;
+  --color-brand-600: #045c42;
+  --color-brand-700: #034531;
+  --color-accent-400: #92c95c;
+  --color-accent-500: #77b234;
+  --color-accent-600: #5f9029;
   --color-sale: #d0021b;
 }
 

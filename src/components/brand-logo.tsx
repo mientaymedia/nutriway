@@ -1,18 +1,21 @@
+import Image from "next/image";
+import logoLight from "../../public/brand/logo.png";
+import logoDark from "../../public/brand/logo-dark.png";
+
 /**
- * Chữ ký thương hiệu NutriWay.
- *
- * TẠM THỜI dựng bằng chữ theo đúng hai màu nhận diện, vì file logo trong thư
- * mục công ty là bộ nhận diện CŨ (chữ serif kèm nhành lá), không khớp bộ mới.
- * Khi có file thật, thay phần bên dưới bằng <Image src="/brand/logo.svg" …>.
+ * Chữ ký thương hiệu NutriWay, dùng đúng file logo chính thức.
+ * `tone="light"` cho nền sáng (chữ xanh), `tone="dark"` cho nền tối (chữ trắng).
  */
-export function BrandLogo({ tone = "light" }: { tone?: "light" | "dark" }) {
-  // "light" là logo cho nền sáng (chữ xanh đậm); "dark" cho nền tối (chữ trắng).
-  const word = tone === "light" ? "text-brand-600" : "text-white";
-  const sub = tone === "light" ? "text-accent-500" : "text-accent-400";
+export function BrandLogo({ tone = "light", height = 34 }: { tone?: "light" | "dark"; height?: number }) {
+  const src = tone === "light" ? logoLight : logoDark;
   return (
-    <span className="inline-flex items-baseline gap-1.5 leading-none select-none">
-      <span className={`text-2xl font-bold tracking-tight ${word}`}>nutriway</span>
-      <span className={`text-sm font-semibold ${sub}`}>vietnam</span>
-    </span>
+    <Image
+      src={src}
+      alt="NutriWay Việt Nam"
+      height={height}
+      // Ảnh gốc tỷ lệ 2,5:1; đặt chiều cao rồi để chiều rộng tự theo.
+      style={{ height, width: "auto" }}
+      priority
+    />
   );
 }
