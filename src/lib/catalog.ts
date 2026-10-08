@@ -143,6 +143,28 @@ export async function getActiveVouchers(limit = 12): Promise<CatalogResult<Vouch
 }
 
 /**
+ * Sản phẩm liên quan: cùng nhà cung cấp, bỏ chính nó ra.
+ * Dựa trên tập đã cache nên không tốn thêm lượt gọi AccessTrade.
+ */
+export async function getRelatedProducts(
+  productId: string,
+  merchant: string | null,
+  limit = 6,
+): Promise<DatafeedProduct[]> {
+  "use cache";
+  cacheLife("hours");
+  const all = await getFeaturedProducts(400);
+  const sameShop = all.items.filter(
+    (product) => product.productId !== productId && product.merchant === merchant,
+  );
+  const others = all.items.filter(
+    (product) => product.productId !== productId && product.merchant !== merchant,
+  );
+  // Ưu tiên cùng gian hàng, thiếu thì lấy thêm sản phẩm khác cho đủ hàng.
+  return [...sameShop, ...others].slice(0, limit);
+}
+
+/**
  * Tìm một sản phẩm theo id, dùng cho trang chi tiết và cho đường dẫn `/go`.
  * Tìm trong cùng tập chiến dịch mà trang chủ hiển thị, nên mọi sản phẩm khách
  * nhìn thấy đều mở được trang chi tiết.
