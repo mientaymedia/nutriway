@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { cacheLife } from "next/cache";
-import { COMPANY, MOIT_PROFILE_URL, phoneHref } from "@/lib/site";
+import { COMPANY, MOIT_PROFILE_URL, POLICIES, phoneHref } from "@/lib/site";
 import { BrandLogo } from "./brand-logo";
 import moitBadge from "../../public/brand/da-thong-bao-bct.png";
 
@@ -15,12 +15,6 @@ async function currentYear(): Promise<number> {
   cacheLife("days");
   return new Date().getFullYear();
 }
-
-const POLICIES = [
-  { href: "/chinh-sach/bao-mat", label: "Bảo mật thông tin" },
-  { href: "/chinh-sach/doi-tra", label: "Đổi trả và hoàn tiền" },
-  { href: "/chinh-sach/lien-ket-tiep-thi", label: "Công bố liên kết tiếp thị" },
-];
 
 export async function SiteFooter() {
   return (
@@ -47,6 +41,7 @@ export async function SiteFooter() {
             {COMPANY.businessIdIssuer} cấp ngày {COMPANY.businessIdDate}.
           </p>
           <p>Người đại diện pháp luật: {COMPANY.legalRepresentative}</p>
+          <p>Chịu trách nhiệm quản lý nội dung: {COMPANY.contentManager}</p>
         </div>
 
         <nav aria-label="Chính sách" className="space-y-2 text-sm">

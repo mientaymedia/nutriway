@@ -23,7 +23,7 @@ export default async function HomePage() {
       <Hero />
 
       <CatalogSection
-        title="Đang giảm giá"
+        title="Sản phẩm nổi bật"
         result={featured}
         toCard={(product) => ({
           productId: product.productId,

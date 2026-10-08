@@ -25,9 +25,13 @@ export function CatalogSection<T>({
   result: CatalogResult<T>;
   toCard: (item: T) => ProductCardData;
 }) {
+  // Gọi được API nhưng mục này không có hàng thì ẩn hẳn, đỡ phải hiện một ô
+  // trống không nói lên điều gì. Chỉ báo khi thiếu cấu hình hoặc gặp lỗi.
+  if (result.state === "ok" && result.items.length === 0) return null;
+
   return (
     <section className="mx-auto max-w-6xl px-4 py-6">
-      <h2 className="mb-3 text-lg font-bold text-brand-700">{title}</h2>
+      {title && <h2 className="mb-3 text-lg font-bold text-brand-700">{title}</h2>}
       {result.items.length === 0 ? (
         <EmptyNote state={result.state} />
       ) : (

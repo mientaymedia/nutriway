@@ -55,13 +55,20 @@ function client(): AccessTradeClient {
   return createAccessTradeClient({ apiKey: ACCESSTRADE_API_KEY });
 }
 
-/** Sản phẩm nổi bật cho trang chủ. */
+/**
+ * Sản phẩm nổi bật cho trang chủ.
+ *
+ * KHÔNG lọc `statusDiscount`. Kiểm chứng ngày 2026-10-08 trên tài khoản thật:
+ * toàn bộ sản phẩm trong kho đều có `status_discount: 0`, và gọi kèm
+ * `status_discount=1` còn làm AccessTrade trả HTTP 502. Lọc theo cờ này nghĩa là
+ * trang chủ luôn trống.
+ */
 export async function getFeaturedProducts(limit = 24): Promise<CatalogResult<DatafeedProduct>> {
   "use cache";
   cacheLife("hours");
   if (!hasAccessTrade()) return notConfigured();
   try {
-    const page = await listDatafeeds(client(), { limit, statusDiscount: 1 });
+    const page = await listDatafeeds(client(), { limit });
     return { state: "ok", items: page.products, skippedCount: page.skipped.length, asOf: Date.now() };
   } catch (error) {
     return failed(error);
