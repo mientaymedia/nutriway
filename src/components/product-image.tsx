@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { proxiedImage } from "@/lib/image-proxy";
 
 /**
  * Ảnh sản phẩm lấy từ CDN của nhà cung cấp.
@@ -25,8 +26,9 @@ export function ProductImage({
   fit?: "cover" | "contain";
 }) {
   const [failed, setFailed] = useState(false);
+  const url = proxiedImage(src);
 
-  if (!src || failed) {
+  if (!url || failed) {
     return (
       <div className="flex h-full w-full items-center justify-center bg-neutral-100 text-xs text-neutral-400">
         Chưa có ảnh
@@ -37,7 +39,7 @@ export function ProductImage({
   return (
     // eslint-disable-next-line @next/next/no-img-element
     <img
-      src={src}
+      src={url}
       alt={alt}
       loading="lazy"
       referrerPolicy="no-referrer"

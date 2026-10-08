@@ -31,11 +31,15 @@ export function CatalogSection<T>({
 
   return (
     <section className="mx-auto max-w-6xl px-4 py-6">
-      {title && <h2 className="mb-3 text-lg font-bold text-brand-700">{title}</h2>}
+      {title && (
+        <h2 className="mb-3 border-b-2 border-brand-600 pb-2 text-base font-medium uppercase tracking-wide text-brand-600">
+          {title}
+        </h2>
+      )}
       {result.items.length === 0 ? (
         <EmptyNote state={result.state} />
       ) : (
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">
           {result.items.map((item) => {
             const card = toCard(item);
             return <ProductCard key={card.productId} product={card} />;
