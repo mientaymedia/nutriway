@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ProductCard } from "@/components/product-card";
 import { ProductImage } from "@/components/product-image";
-import { findProduct, getRelatedProducts } from "@/lib/catalog";
+import { findProduct, getRelatedProducts, isOfficialMerchant, merchantLabel } from "@/lib/catalog";
 import { discountPercent, formatVnd } from "@/lib/format";
 
 interface PageProps {
@@ -52,7 +52,8 @@ export default async function ProductPage({ params }: PageProps) {
   if (!product) notFound();
 
   const off = discountPercent(product.price, product.salePrice);
-  const shop = product.merchant ?? product.domain ?? "gian hàng đối tác";
+  const shop = merchantLabel(product.merchant) ?? product.domain ?? "gian hàng đối tác";
+  const official = isOfficialMerchant(product.merchant);
   const related = await getRelatedProducts(product.productId, product.merchant, 6);
   const buyHref = `/go/${encodeURIComponent(product.productId)}`;
 
@@ -82,7 +83,14 @@ export default async function ProductPage({ params }: PageProps) {
 
           <dl className="grid grid-cols-[88px_1fr] gap-y-2 text-sm">
             <dt className="text-neutral-500">Gian hàng</dt>
-            <dd className="text-neutral-800">{shop}</dd>
+            <dd className="text-neutral-800">
+              {official && (
+                <span className="mr-1.5 inline-block bg-brand-600 px-1.5 py-px text-[10px] font-bold text-white">
+                  CHÍNH HÃNG
+                </span>
+              )}
+              {shop}
+            </dd>
             {product.category && (
               <>
                 <dt className="text-neutral-500">Ngành hàng</dt>
@@ -145,7 +153,8 @@ export default async function ProductPage({ params }: PageProps) {
                   imageUrl: item.imageUrl,
                   price: item.price,
                   salePrice: item.salePrice,
-                  merchant: item.merchant,
+                  merchant: merchantLabel(item.merchant),
+                  official: isOfficialMerchant(item.merchant),
                 }}
               />
             ))}

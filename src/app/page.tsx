@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { CatalogSection } from "@/components/catalog-section";
-import { getBestSellers, getFeaturedProducts } from "@/lib/catalog";
+import { getBestSellers, getFeaturedProducts, isOfficialMerchant, merchantLabel } from "@/lib/catalog";
 
 /** Dải danh mục, dẫn thẳng vào trang tìm kiếm theo từ khoá. */
 const CATEGORIES = [
@@ -72,7 +72,8 @@ export default async function HomePage() {
           imageUrl: product.imageUrl,
           price: product.price,
           salePrice: product.salePrice,
-          merchant: product.merchant,
+          merchant: merchantLabel(product.merchant),
+          official: isOfficialMerchant(product.merchant),
         })}
       />
 

@@ -10,6 +10,8 @@ export interface ProductCardData {
   salePrice: number;
   merchant: string | null;
   soldCount?: number | null;
+  /** Hàng từ nhà bán lẻ chính hãng, tương đương nhãn Mall của các sàn. */
+  official?: boolean;
 }
 
 /** Thẻ sản phẩm theo bố cục quen thuộc của chợ điện tử: ảnh vuông, tên 2 dòng, giá nổi bật. */
@@ -33,7 +35,14 @@ export function ProductCard({ product }: { product: ProductCardData }) {
       </div>
 
       <div className="flex flex-1 flex-col gap-1.5 p-2">
-        <h3 className="line-clamp-2 min-h-[2.5rem] text-[13px] leading-5 text-neutral-800">{product.name}</h3>
+        <h3 className="line-clamp-2 min-h-[2.5rem] text-[13px] leading-5 text-neutral-800">
+          {product.official && (
+            <span className="mr-1 inline-block bg-brand-600 px-1 py-px align-[2px] text-[10px] font-bold text-white">
+              CHÍNH HÃNG
+            </span>
+          )}
+          {product.name}
+        </h3>
 
         <div className="mt-auto flex items-baseline gap-1">
           <span className="text-[15px] font-medium text-sale">{formatVnd(product.salePrice)}</span>

@@ -56,16 +56,60 @@ function client(): AccessTradeClient {
 }
 
 /**
- * Chiến dịch dùng cho trang chủ.
+ * Nhà bán lẻ chính hãng — tương đương "Mall" của các sàn.
  *
- * PHẢI lọc theo chiến dịch. Kiểm chứng ngày 2026-10-08 trên tài khoản thật:
- * gọi `/v1/datafeeds` không lọc thì 200 sản phẩm đầu đều là `30shine_store` với
- * `update_time` năm 2023, và mọi ảnh của nhà cung cấp đó đã bị xoá khỏi CDN
- * (hstatic trả 404). Hai chiến dịch dưới đây có dữ liệu năm 2026.
+ * Datafeed của AccessTrade KHÔNG có cờ Mall: không trường `is_mall`, `shop_id`
+ * rỗng, `shop_name` là tên người bán cá nhân, URL không chứa "mall". Kiểm tra cả
+ * 51 chiến dịch đã duyệt cũng không có chiến dịch Mall nào.
  *
- * Thêm hoặc bớt tại đây khi có chiến dịch mới được duyệt trên pub2.accesstrade.vn.
+ * Nên thay vì đoán, ưu tiên theo nguồn: các chiến dịch dưới đây là nhà bán lẻ
+ * chính hãng, hàng có nguồn gốc rõ ràng. Kiểm chứng 2026-10-08: tất cả đều có
+ * dữ liệu năm 2026 và đủ ảnh.
  */
-export const FEATURED_CAMPAIGNS = ["shopee", "cellphones_cps"] as const;
+export const OFFICIAL_CAMPAIGNS = [
+  "cellphones_cps",
+  "tikivn",
+  "hoanghamobile",
+  "dmx",
+  "concung",
+  "beautybox",
+] as const;
+
+/** Sàn mở, người bán cá nhân. Xếp sau hàng chính hãng. */
+export const MARKETPLACE_CAMPAIGNS = ["shopee"] as const;
+
+export const FEATURED_CAMPAIGNS = [...OFFICIAL_CAMPAIGNS, ...MARKETPLACE_CAMPAIGNS] as const;
+
+const OFFICIAL_SET: ReadonlySet<string> = new Set(OFFICIAL_CAMPAIGNS);
+
+/** Sản phẩm đến từ nhà bán lẻ chính hãng hay không. */
+export function isOfficialMerchant(merchant: string | null): boolean {
+  return merchant !== null && OFFICIAL_SET.has(merchant);
+}
+
+/** Tên hiển thị cho khách, thay cho mã chiến dịch kỹ thuật. */
+const MERCHANT_LABELS: Record<string, string> = {
+  cellphones_cps: "CellphoneS",
+  tikivn: "Tiki",
+  hoanghamobile: "Hoàng Hà Mobile",
+  dmx: "Điện Máy Xanh",
+  concung: "Con Cưng",
+  beautybox: "Beauty Box",
+  shopee: "Shopee",
+};
+
+export function merchantLabel(merchant: string | null): string | null {
+  if (!merchant) return null;
+  return MERCHANT_LABELS[merchant] ?? merchant;
+}
+
+/** Hàng chính hãng lên trước, trong mỗi nhóm giữ nguyên thứ tự sẵn có. */
+function officialFirst(items: readonly DatafeedProduct[]): DatafeedProduct[] {
+  return [
+    ...items.filter((product) => isOfficialMerchant(product.merchant)),
+    ...items.filter((product) => !isOfficialMerchant(product.merchant)),
+  ];
+}
 
 /**
  * Sản phẩm nổi bật cho trang chủ, gộp từ các chiến dịch còn sống.
@@ -97,7 +141,7 @@ export async function getFeaturedProducts(limit = 24): Promise<CatalogResult<Dat
 
     return {
       state: "ok",
-      items: items.slice(0, limit),
+      items: officialFirst(items).slice(0, limit),
       skippedCount: pages.reduce((sum, page) => sum + page.skipped.length, 0),
       asOf: Date.now(),
     };
@@ -190,7 +234,7 @@ export async function getProductPool(): Promise<CatalogResult<DatafeedProduct>> 
     }
     return {
       state: "ok",
-      items,
+      items: officialFirst(items),
       skippedCount: pages.reduce((sum, page) => sum + page.skipped.length, 0),
       asOf: Date.now(),
     };
@@ -212,7 +256,10 @@ function sorted(items: readonly DatafeedProduct[], sort: SortKey): DatafeedProdu
         return rate(b) - rate(a);
       });
     default:
-      return copy.sort((a, b) => (b.updatedAt?.getTime() ?? 0) - (a.updatedAt?.getTime() ?? 0));
+      // Mặc định: hàng chính hãng trước, trong đó cái mới cập nhật lên đầu.
+      return officialFirst(
+        copy.sort((a, b) => (b.updatedAt?.getTime() ?? 0) - (a.updatedAt?.getTime() ?? 0)),
+      );
   }
 }
 
