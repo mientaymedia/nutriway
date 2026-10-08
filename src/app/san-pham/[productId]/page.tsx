@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { ProductImage } from "@/components/product-image";
 import { findProduct } from "@/lib/catalog";
 import { discountPercent, formatVnd } from "@/lib/format";
 
@@ -31,13 +32,7 @@ export default async function ProductPage({ params }: PageProps) {
     <article className="mx-auto max-w-6xl px-4 py-6">
       <div className="grid gap-6 rounded-lg bg-white p-4 sm:grid-cols-2 sm:p-6">
         <div className="aspect-square overflow-hidden rounded bg-neutral-100">
-          {product.imageUrl ? (
-            /* Ảnh từ CDN của sàn, host thay đổi liên tục nên không dùng next/image. */
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={product.imageUrl} alt="" className="h-full w-full object-contain" />
-          ) : (
-            <div className="flex h-full items-center justify-center text-sm text-neutral-400">Chưa có ảnh</div>
-          )}
+          <ProductImage src={product.imageUrl} alt={product.name} fit="contain" />
         </div>
 
         <div className="flex flex-col gap-4">

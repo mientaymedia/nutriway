@@ -2,8 +2,8 @@ import type { AccessTradeClient } from "./client";
 import { unwrapList } from "./envelopes";
 import {
   normalizeEach,
-  optHttpUrl,
   optId,
+  optImageUrl,
   optMoney,
   optString,
   reqHttpUrl,
@@ -47,7 +47,7 @@ export function normalizeTopProduct(raw: Raw): TopProduct {
     productCategory: optString(raw, "product_category"),
     url: reqHttpUrl(raw, "link"),
     affLink: reqHttpUrl(raw, "aff_link"),
-    imageUrl: optHttpUrl(raw, "image"),
+    imageUrl: optImageUrl(raw, "image"),
     price,
     salePrice: optMoney(raw, "discount") ?? price,
     description: optString(raw, "desc"),

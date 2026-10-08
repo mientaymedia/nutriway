@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { compactCount, discountPercent, formatVnd } from "@/lib/format";
+import { ProductImage } from "./product-image";
 
 export interface ProductCardData {
   productId: string;
@@ -18,20 +19,8 @@ export function ProductCard({ product }: { product: ProductCardData }) {
       href={`/san-pham/${encodeURIComponent(product.productId)}`}
       className="group flex flex-col overflow-hidden rounded-lg bg-white shadow-sm transition hover:shadow-md focus:outline-2 focus:outline-offset-2 focus:outline-brand-600"
     >
-      <div className="relative aspect-square bg-neutral-100">
-        {product.imageUrl ? (
-          /* Ảnh đến từ nhiều CDN của các sàn, danh sách host thay đổi liên tục nên
-             dùng thẻ img thường thay vì next/image để không vỡ khi gặp host lạ. */
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={product.imageUrl}
-            alt=""
-            loading="lazy"
-            className="h-full w-full object-cover transition group-hover:scale-105"
-          />
-        ) : (
-          <div className="flex h-full items-center justify-center text-sm text-neutral-400">Chưa có ảnh</div>
-        )}
+      <div className="relative aspect-square overflow-hidden bg-neutral-100">
+        <ProductImage src={product.imageUrl} className="transition group-hover:scale-105" />
         {off !== null && (
           <span className="absolute right-0 top-0 rounded-bl bg-sale px-1.5 py-0.5 text-xs font-bold text-white">
             -{off}%

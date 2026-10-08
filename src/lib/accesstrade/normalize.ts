@@ -49,6 +49,16 @@ export function reqHttpUrl(raw: Raw, key: string): string {
   return httpUrl(reqString(raw, key), key);
 }
 
+/**
+ * URL ảnh tuỳ chọn. Nâng `http://` lên `https://` vì trang chạy HTTPS, mà trình
+ * duyệt chặn thẳng ảnh HTTP (mixed content) nên ảnh sẽ không bao giờ hiện.
+ * Kiểm chứng ngày 2026-10-08: 13 trong 200 sản phẩm của kho trả về URL `http://`.
+ */
+export function optImageUrl(raw: Raw, key: string): string | null {
+  const value = optHttpUrl(raw, key);
+  return value === null ? null : value.replace(/^http:\/\//i, "https://");
+}
+
 /** URL tuỳ chọn: giá trị hỏng hoặc không phải http(s) thành null, không làm hỏng cả bản ghi. */
 export function optHttpUrl(raw: Raw, key: string): string | null {
   const value = optString(raw, key);

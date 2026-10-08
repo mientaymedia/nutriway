@@ -2,7 +2,7 @@ import type { AccessTradeClient } from "./client";
 import { unwrapList } from "./envelopes";
 import {
   normalizeEach,
-  optHttpUrl,
+  optImageUrl,
   optMoney,
   optNumber,
   optString,
@@ -56,7 +56,7 @@ export function normalizeDatafeedProduct(raw: Raw): DatafeedProduct {
     category: optString(raw, "cate"),
     url: reqHttpUrl(raw, "url"),
     affLink: reqHttpUrl(raw, "aff_link"),
-    imageUrl: optHttpUrl(raw, "image"),
+    imageUrl: optImageUrl(raw, "image"),
     price,
     salePrice: optMoney(raw, "discount") ?? price,
     discountAmount: optMoney(raw, "discount_amount") ?? 0,
