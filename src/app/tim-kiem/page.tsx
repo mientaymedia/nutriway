@@ -27,8 +27,8 @@ export default async function SearchPage({
   const query = (q ?? "").trim();
 
   // Chưa có cơ sở dữ liệu nên lọc trên danh mục đã tải sẵn. Khi có Postgres thì
-  // thay bằng truy vấn toàn văn, lúc đó mới tìm được trên toàn bộ kho.
-  const source = await getFeaturedProducts(200);
+  // thay bằng truy vấn toàn văn, lúc đó mới tìm được trên toàn bộ kho 16 triệu sản phẩm.
+  const source = await getFeaturedProducts(400);
   const words = fold(query).split(/\s+/).filter(Boolean);
   const items =
     words.length === 0

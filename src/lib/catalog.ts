@@ -56,20 +56,51 @@ function client(): AccessTradeClient {
 }
 
 /**
- * Sản phẩm nổi bật cho trang chủ.
+ * Chiến dịch dùng cho trang chủ.
  *
- * KHÔNG lọc `statusDiscount`. Kiểm chứng ngày 2026-10-08 trên tài khoản thật:
- * toàn bộ sản phẩm trong kho đều có `status_discount: 0`, và gọi kèm
- * `status_discount=1` còn làm AccessTrade trả HTTP 502. Lọc theo cờ này nghĩa là
- * trang chủ luôn trống.
+ * PHẢI lọc theo chiến dịch. Kiểm chứng ngày 2026-10-08 trên tài khoản thật:
+ * gọi `/v1/datafeeds` không lọc thì 200 sản phẩm đầu đều là `30shine_store` với
+ * `update_time` năm 2023, và mọi ảnh của nhà cung cấp đó đã bị xoá khỏi CDN
+ * (hstatic trả 404). Hai chiến dịch dưới đây có dữ liệu năm 2026.
+ *
+ * Thêm hoặc bớt tại đây khi có chiến dịch mới được duyệt trên pub2.accesstrade.vn.
+ */
+export const FEATURED_CAMPAIGNS = ["shopee", "cellphones_cps"] as const;
+
+/**
+ * Sản phẩm nổi bật cho trang chủ, gộp từ các chiến dịch còn sống.
+ *
+ * KHÔNG lọc `statusDiscount`: toàn bộ kho đều có `status_discount: 0`, và gọi kèm
+ * `status_discount=1` còn làm AccessTrade trả HTTP 502.
  */
 export async function getFeaturedProducts(limit = 24): Promise<CatalogResult<DatafeedProduct>> {
   "use cache";
   cacheLife("hours");
   if (!hasAccessTrade()) return notConfigured();
   try {
-    const page = await listDatafeeds(client(), { limit });
-    return { state: "ok", items: page.products, skippedCount: page.skipped.length, asOf: Date.now() };
+    const at = client();
+    const perCampaign = Math.max(1, Math.ceil(limit / FEATURED_CAMPAIGNS.length));
+    const pages = await Promise.all(
+      FEATURED_CAMPAIGNS.map((campaign) => listDatafeeds(at, { campaign, limit: perCampaign })),
+    );
+
+    // Sản phẩm không có ảnh hiển thị rất tệ trong lưới, nên bỏ qua.
+    const items: DatafeedProduct[] = [];
+    const seen = new Set<string>();
+    for (const page of pages) {
+      for (const product of page.products) {
+        if (!product.imageUrl || seen.has(product.productId)) continue;
+        seen.add(product.productId);
+        items.push(product);
+      }
+    }
+
+    return {
+      state: "ok",
+      items: items.slice(0, limit),
+      skippedCount: pages.reduce((sum, page) => sum + page.skipped.length, 0),
+      asOf: Date.now(),
+    };
   } catch (error) {
     return failed(error);
   }
@@ -111,14 +142,25 @@ export async function getActiveVouchers(limit = 12): Promise<CatalogResult<Vouch
   }
 }
 
-/** Tìm một sản phẩm theo id, dùng cho trang chi tiết và cho đường dẫn `/go`. */
+/**
+ * Tìm một sản phẩm theo id, dùng cho trang chi tiết và cho đường dẫn `/go`.
+ * Tìm trong cùng tập chiến dịch mà trang chủ hiển thị, nên mọi sản phẩm khách
+ * nhìn thấy đều mở được trang chi tiết.
+ */
 export async function findProduct(productId: string): Promise<DatafeedProduct | null> {
   "use cache";
   cacheLife("hours");
   if (!hasAccessTrade()) return null;
   try {
-    const page = await listDatafeeds(client(), { limit: 200 });
-    return page.products.find((product) => product.productId === productId) ?? null;
+    const at = client();
+    const pages = await Promise.all(
+      FEATURED_CAMPAIGNS.map((campaign) => listDatafeeds(at, { campaign, limit: 200 })),
+    );
+    for (const page of pages) {
+      const found = page.products.find((product) => product.productId === productId);
+      if (found) return found;
+    }
+    return null;
   } catch {
     return null;
   }
