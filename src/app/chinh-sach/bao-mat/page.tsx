@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { COMPANY, phoneHref } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Chính sách bảo mật",
@@ -63,10 +64,21 @@ export default function Page() {
       </p>
 
       <h2>Liên hệ</h2>
-      <p>
-        Công ty TNHH Thương mại Dịch vụ Nutriway Việt Nam.
-        {/* TODO: bổ sung địa chỉ, mã số thuế, email và số điện thoại trước khi quảng bá rộng. */}
-      </p>
+      <address className="not-italic">
+        <p className="font-semibold text-neutral-900">{COMPANY.legalName}</p>
+        <p>Địa chỉ: {COMPANY.address}</p>
+        <p>
+          Điện thoại:{" "}
+          <a href={phoneHref} className="text-brand-600 underline">
+            {COMPANY.phone}
+          </a>
+        </p>
+        <p>
+          Giấy chứng nhận đăng ký doanh nghiệp số {COMPANY.businessId}, do {COMPANY.businessIdIssuer} cấp
+          ngày {COMPANY.businessIdDate}.
+        </p>
+        <p>Người đại diện pháp luật: {COMPANY.legalRepresentative}</p>
+      </address>
     </>
   );
 }
