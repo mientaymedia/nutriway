@@ -28,10 +28,26 @@ Lưu ý:
 ## 3. Tên miền
 
 1. **Settings → Domains** → thêm `nutriway.vn` và `www.nutriway.vn`.
-2. Domain đang ở Cloudflare, nên Vercel sẽ yêu cầu thêm bản ghi DNS. Trong Cloudflare:
-   - Thêm bản ghi theo đúng tên và giá trị Vercel đưa.
-   - Đặt proxy ở chế độ **DNS only** (mây xám) cho các bản ghi này. Bật proxy (mây cam) chồng lên Vercel dễ gây lỗi vòng lặp chứng chỉ.
-3. Chờ Vercel cấp chứng chỉ, thường vài phút.
+2. Vercel cấp một địa chỉ CNAME riêng cho dự án này:
+
+   ```
+   cb6acb2a98cd0a54.vercel-dns-017.com
+   ```
+
+3. Trong Cloudflare, mục **DNS → Records**, thêm đúng hai bản ghi:
+
+   | Type | Name | Target | Proxy status |
+   |---|---|---|---|
+   | CNAME | `@` | `cb6acb2a98cd0a54.vercel-dns-017.com` | **DNS only** (mây xám) |
+   | CNAME | `www` | `cb6acb2a98cd0a54.vercel-dns-017.com` | **DNS only** (mây xám) |
+
+   - Cloudflare tự làm phẳng CNAME ở tên miền gốc nên đặt CNAME cho `@` được, không cần bản ghi A.
+   - **Phải để DNS only.** Bật proxy (mây cam) thì Vercel không xác minh được tên miền và không cấp được chứng chỉ, trang sẽ lỗi 525 hoặc lặp chuyển hướng.
+   - Nếu `@` hoặc `www` đã có bản ghi A, AAAA hay CNAME cũ thì **xoá trước**, vì trùng tên sẽ xung đột.
+
+4. Quay lại Vercel, chờ trạng thái tên miền chuyển sang **Valid**. Thường vài phút, chậm nhất là theo thời gian TTL cũ.
+
+> Muốn dùng tính năng của Cloudflare (cache, WAF) thì phải đổi cách: trỏ proxy về Vercel và đặt SSL/TLS ở chế độ **Full (strict)**. Chưa cần ở giai đoạn này vì Vercel đã có CDN sẵn.
 
 ## 4. Kiểm tra sau khi deploy
 
