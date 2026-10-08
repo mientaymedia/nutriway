@@ -22,10 +22,15 @@ Cập nhật ngay khi xong mỗi tính năng (đã chạy thử). Chi tiết thi
 - [ ] `transactions`, `order-list`, `order-products` (nhóm đối soát, giới hạn 10 request/phút)
 - [ ] Đồng bộ định kỳ vào Postgres: `cashback/campaigns`, `datafeeds`, `top_products`, voucher
 - [ ] Chạy thử các câu hỏi cần kiểm chứng ở `integrations/accesstrade-api.md` mục 7
-- [ ] Quản trị duyệt sản phẩm
-- [ ] `/go/[productId]`: ghi click, tạo link, chuyển hướng
-- [ ] Giao diện kiểu chợ điện tử: trang chủ, danh mục, chi tiết, voucher, tìm kiếm
-- [ ] SEO: sitemap, meta, dữ liệu có cấu trúc
+- [x] Website công khai: trang chủ, trang chi tiết sản phẩm, `/go/[productId]` (chặn open redirect), cache bằng `'use cache'`
+- [x] Đóng gói Docker (`output: standalone`) cho đường tự host
+- [ ] Đặt `ACCESSTRADE_API_KEY` trên Vercel để danh mục có sản phẩm
+- [ ] Chép file logo thật vào `public/brand/` rồi thay `brand-logo.tsx`
+- [ ] Trang khuyến mãi, tìm kiếm, danh mục (header đã có liên kết nhưng chưa có trang)
+- [ ] Ba trang chính sách: bảo mật, đổi trả, công bố liên kết tiếp thị
+- [ ] Quản trị duyệt sản phẩm (cần cơ sở dữ liệu)
+- [ ] Ghi lượt click vào `affiliate_clicks` và truyền `click_id` qua `utm_content` (cần cơ sở dữ liệu)
+- [ ] SEO: sitemap, robots.txt, dữ liệu có cấu trúc
 
 ## Giai đoạn 2 — Tự bán
 

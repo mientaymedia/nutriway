@@ -7,6 +7,7 @@
 | [business-flow.md](business-flow.md) | Luồng nghiệp vụ: affiliate, mua trực tiếp, đơn Droppii, hoàn tiền, hoá đơn |
 | [spec.md](spec.md) | Công nghệ, mô hình dữ liệu, trạng thái, trang, API, bảo mật, vận hành |
 | [roadmap.md](roadmap.md) | Lộ trình theo giai đoạn và các việc đang chờ |
+| [trien-khai-vercel.md](trien-khai-vercel.md) | Đưa nutriway.vn lên Vercel: nối repo, biến môi trường, tên miền, kiểm tra |
 | [integrations/accesstrade-api.md](integrations/accesstrade-api.md) | AccessTrade Publisher API: 20 endpoint, cạm bẫy, câu hỏi cần kiểm chứng |
 | [integrations/momo.md](integrations/momo.md) | Thanh toán MoMo: tạo giao dịch, chuỗi ký, IPN |
 

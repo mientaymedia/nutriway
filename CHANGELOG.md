@@ -17,5 +17,10 @@ Theo định dạng [Keep a Changelog](https://keepachangelog.com/vi/1.1.0/). C�
 - Voucher (`offers.ts`): `listVouchers`, `findVouchersByUrl`, `listHotVouchers`, `listVoucherMerchants`, `listVoucherKeywords`. Đọc cả hai dạng ngày (RFC 1123 và `{$date}`), `is_hot` dạng chuỗi, giữ cả id chiến dịch ngắn và dài. `fixProdLink` mã hoá lại URL đích của `prod_link` để `voucherCode` và `signature` không rơi khỏi link. `isVoucherActive` loại voucher hết hạn hoặc đã dùng hết lượt.
 - `normalize.ts`: hàm chuẩn hoá dùng chung; bản ghi hỏng không làm hỏng cả trang mà được ghi vào `skipped` kèm lý do; link chỉ nhận http(s).
 
+- Endpoint `transactions` (`listTransactions`): đi qua bộ điều tiết 10 request/phút, chặn bẫy `is_confirmed` không kèm `status`, bỏ `_extra` để không lưu user agent của người click.
+- Website công khai: trang chủ, trang chi tiết sản phẩm, `/go/[productId]` chỉ chuyển tới link affiliate của đúng sản phẩm. Thiếu API key thì hiện trạng thái "chưa kết nối" thay vì sập trang.
+- Đóng gói Docker (`output: standalone`, chạy bằng user thường) và hướng dẫn `docs/trien-khai-vercel.md`.
+
 ### Đổi
 - `@types/node` nâng từ `^20` lên `^24` cho khớp Node 24 và vitest 5.
+- Bật `cacheComponents` của Next 16. Kéo theo: không dùng được `export const dynamic`, không đọc thẳng `new Date()` khi prerender, và trang phụ thuộc `params` cần `instant = false`.
