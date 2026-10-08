@@ -3,6 +3,7 @@ import { unwrapList } from "./envelopes";
 import {
   normalizeEach,
   optHttpUrl,
+  optId,
   optMoney,
   optString,
   reqHttpUrl,
@@ -35,18 +36,13 @@ export interface TopProduct {
   shortDescription: string | null;
 }
 
-function idOrNull(raw: Raw, key: string): string | null {
-  const value = raw[key];
-  return typeof value === "number" ? String(value) : optString(raw, key);
-}
-
 export function normalizeTopProduct(raw: Raw): TopProduct {
   const price = reqMoney(raw, "price");
   return {
     productId: asId(raw.product_id, "product_id"),
     name: reqString(raw, "name"),
     brand: optString(raw, "brand"),
-    categoryId: idOrNull(raw, "category_id"),
+    categoryId: optId(raw, "category_id"),
     categoryName: optString(raw, "category_name"),
     productCategory: optString(raw, "product_category"),
     url: reqHttpUrl(raw, "link"),

@@ -74,6 +74,12 @@ export function optMoney(raw: Raw, key: string): number | null {
   return value === undefined || value === null ? null : moneyOf(value, key);
 }
 
+/** Id tuỳ chọn: chuỗi không rỗng, hoặc số nguyên an toàn đổi thành chuỗi; còn lại là null. */
+export function optId(raw: Raw, key: string): string | null {
+  const value = raw[key];
+  return typeof value === "number" && Number.isSafeInteger(value) ? String(value) : optString(raw, key);
+}
+
 export function optNumber(raw: Raw, key: string): number | null {
   const value = raw[key];
   return typeof value === "number" && Number.isFinite(value) ? value : null;
