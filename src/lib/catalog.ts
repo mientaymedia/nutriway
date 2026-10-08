@@ -21,10 +21,22 @@ export interface CatalogResult<T> {
   message?: string;
   /** Số bản ghi bị bỏ qua vì dữ liệu hỏng. */
   skippedCount: number;
+  /**
+   * Mốc thời gian (epoch mili-giây) lúc lấy dữ liệu. Lấy ở đây, bên trong hàm đã
+   * cache, vì Next 16 không cho đọc đồng hồ khi dựng trang. Giao diện dùng mốc này
+   * để đếm ngược, nhờ vậy số giờ còn lại khớp đúng với lúc lọc.
+   */
+  asOf: number;
 }
 
 function notConfigured<T>(): CatalogResult<T> {
-  return { state: "not_configured", items: [], skippedCount: 0, message: "Chưa cấu hình ACCESSTRADE_API_KEY" };
+  return {
+    state: "not_configured",
+    items: [],
+    skippedCount: 0,
+    asOf: Date.now(),
+    message: "Chưa cấu hình ACCESSTRADE_API_KEY",
+  };
 }
 
 function failed<T>(error: unknown): CatalogResult<T> {
@@ -32,6 +44,7 @@ function failed<T>(error: unknown): CatalogResult<T> {
     state: "error",
     items: [],
     skippedCount: 0,
+    asOf: Date.now(),
     message: error instanceof Error ? error.message : String(error),
   };
 }
@@ -49,7 +62,7 @@ export async function getFeaturedProducts(limit = 24): Promise<CatalogResult<Dat
   if (!hasAccessTrade()) return notConfigured();
   try {
     const page = await listDatafeeds(client(), { limit, statusDiscount: 1 });
-    return { state: "ok", items: page.products, skippedCount: page.skipped.length };
+    return { state: "ok", items: page.products, skippedCount: page.skipped.length, asOf: Date.now() };
   } catch (error) {
     return failed(error);
   }
@@ -62,7 +75,7 @@ export async function getBestSellers(): Promise<CatalogResult<TopProduct>> {
   if (!hasAccessTrade()) return notConfigured();
   try {
     const page = await listTopProducts(client());
-    return { state: "ok", items: page.products, skippedCount: page.skipped.length };
+    return { state: "ok", items: page.products, skippedCount: page.skipped.length, asOf: Date.now() };
   } catch (error) {
     return failed(error);
   }
@@ -79,11 +92,12 @@ export async function getActiveVouchers(limit = 12): Promise<CatalogResult<Vouch
   if (!hasAccessTrade()) return notConfigured();
   try {
     const page = await listVouchers(client(), { limit });
-    const now = new Date();
+    const asOf = Date.now();
     return {
       state: "ok",
-      items: page.vouchers.filter((voucher) => isVoucherActive(voucher, now)),
+      items: page.vouchers.filter((voucher) => isVoucherActive(voucher, new Date(asOf))),
       skippedCount: page.skipped.length,
+      asOf,
     };
   } catch (error) {
     return failed(error);
