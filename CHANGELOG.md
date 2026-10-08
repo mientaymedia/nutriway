@@ -14,6 +14,7 @@ Theo định dạng [Keep a Changelog](https://keepachangelog.com/vi/1.1.0/). C�
 - Script `npm test` (vitest) và `npm run typecheck`.
 - Endpoint `datafeeds` (`listDatafeeds`): `discount` hiểu đúng là giá sau giảm, ngày `DD-MM-YYYY` theo giờ Việt Nam, `hasMore` dựa vào số bản ghi, `limit` 1 đến 200.
 - Endpoint `top_products` (`listTopProducts`): không phân trang, `total` không đáng tin, từ chối `from` sau `to`.
+- Voucher (`offers.ts`): `listVouchers`, `findVouchersByUrl`, `listHotVouchers`, `listVoucherMerchants`, `listVoucherKeywords`. Đọc cả hai dạng ngày (RFC 1123 và `{$date}`), `is_hot` dạng chuỗi, giữ cả id chiến dịch ngắn và dài. `fixProdLink` mã hoá lại URL đích của `prod_link` để `voucherCode` và `signature` không rơi khỏi link. `isVoucherActive` loại voucher hết hạn hoặc đã dùng hết lượt.
 - `normalize.ts`: hàm chuẩn hoá dùng chung; bản ghi hỏng không làm hỏng cả trang mà được ghi vào `skipped` kèm lý do; link chỉ nhận http(s).
 
 ### Đổi
